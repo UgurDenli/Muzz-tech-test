@@ -48,7 +48,7 @@ fun TextEntryBox(messages: MutableList<Message>, onMessageSent: (String) -> Unit
             onValueChange = { messageText = it },
             modifier = Modifier
                 .weight(1f)
-                .border(1.dp, Color.Gray, CircleShape)
+                .border(1.dp, Pink300, CircleShape)
                 .padding(bottom = bottomPadding.value),
             placeholder = {
                 Text(
