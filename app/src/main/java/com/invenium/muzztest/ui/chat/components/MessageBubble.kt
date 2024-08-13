@@ -14,8 +14,8 @@ import com.invenium.muzztest.data.local.entity.Message
 @Composable
 fun MessageBubble(message: Message) {
     val isSentByCurrentUser = message.sender == "User 1"
-    val bubbleColor = if (isSentByCurrentUser) Color.Blue else Color.White
-    val textColor = if (isSentByCurrentUser) Color.White else Color.Black
+    val bubbleColor = if (isSentByCurrentUser) Color.Blue else Color.LightGray
+    val textColor = if (isSentByCurrentUser) Color.White else Color.Blue
 
     Row(
         modifier = Modifier
@@ -31,7 +31,7 @@ fun MessageBubble(message: Message) {
             contentAlignment = Alignment.Center
         ) {
             Text(
-                text = "${message.sender}: ${message.content}",
+                text = message.content,
                 color = textColor
             )
         }
