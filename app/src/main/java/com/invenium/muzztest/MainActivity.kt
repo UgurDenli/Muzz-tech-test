@@ -10,8 +10,11 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.* // ktlint-disable no-wildcard-imports
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import com.invenium.muzztest.data.local.entity.Message
+import com.invenium.muzztest.ui.chat.components.TextEntryBox
 import com.invenium.muzztest.ui.theme.MuzzTestTheme
 
 class MainActivity : ComponentActivity() {
@@ -19,6 +22,7 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         setContent {
             MuzzTestTheme {
+                val messages = remember { mutableStateListOf<Message>() }
                 Scaffold(
                     topBar = { TopAppBar(title = { Text("Muzz Chat") }) },
                     bottomBar = { BottomAppBar(content = { Text("Send") }) }
@@ -28,8 +32,10 @@ class MainActivity : ComponentActivity() {
                             .fillMaxSize()
                             .padding(innerPadding)
                     ) {
-                        MessageList()
-                        TextEntryBox()
+                        MessageList(messages = messages)
+                        TextEntryBox(messages = messages, onMessageSent = { messageText ->
+                            messages.add(Message("User 1", messageText, System.currentTimeMillis()))
+                        })
                     }
                 }
             }
@@ -38,15 +44,9 @@ class MainActivity : ComponentActivity() {
 }
 
 @Composable
-fun MessageList() {
+fun MessageList(messages: List<Message>) {
     LazyColumn(reverseLayout = true) {
-        val sampleMessages = listOf(
-            Message("User 1", "Hello!", System.currentTimeMillis() - 10000),
-            Message("User 2", "Hi there!", System.currentTimeMillis() - 8000),
-            Message("User 1", "How are you?", System.currentTimeMillis() - 6000),
-            Message("User 2", "I'm doing well, thanks!", System.currentTimeMillis() - 4000)
-        )
-        items(sampleMessages) { message ->
+        items(messages) { message ->
             MessageBubble(message)
         }
     }
@@ -55,9 +55,4 @@ fun MessageList() {
 @Composable
 fun MessageBubble(message: Message) {
     Text(text = "${message.sender}: ${message.content}")
-}
-
-@Composable
-fun TextEntryBox() {
-    Text(text = "Text Entry Box")
 }
