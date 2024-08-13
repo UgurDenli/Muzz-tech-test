@@ -4,13 +4,18 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.* // Only necessary imports
+import androidx.compose.foundation.border
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material.* // Only necessary imports
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -19,6 +24,7 @@ import com.invenium.muzztest.ui.chat.components.MessageBubble
 import com.invenium.muzztest.ui.chat.components.TextEntryBox
 import com.invenium.muzztest.ui.theme.MuzzTestTheme
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -29,32 +35,63 @@ class MainActivity : ComponentActivity() {
             MuzzTestTheme {
                 val messages = remember { mutableStateListOf<Message>().apply { addAll(sampleMessages) } }
                 var isOtherUserTyping by remember { mutableStateOf(false) }
+                var showOtherUserMessage by remember { mutableStateOf(false) }
+                var lastUserMessage by remember { mutableStateOf("") }
+
+                val coroutineScope = rememberCoroutineScope()
 
                 Scaffold(
-                    topBar = { TopAppBar(title = { Text("Muzz Chat") }) },
+                    topBar = {
+                        TopAppBar(
+                            title = { TopAppBarContent() },
+                            backgroundColor = MaterialTheme.colors.primary
+                        )
+                    },
                     content = { innerPadding ->
-                        Box(
+                        Column(
                             modifier = Modifier
                                 .fillMaxSize()
                                 .padding(innerPadding)
-                                .background(Color.Black)
                         ) {
-                            Column(modifier = Modifier.fillMaxSize()) {
-                                MessageList(messages = messages, isOtherUserTyping = isOtherUserTyping, modifier = Modifier.weight(1f))
-                                TextEntryBox(
-                                    messages = messages,
-                                    onMessageSent = { messageText ->
-                                        messages.add(Message("User 1", messageText, System.currentTimeMillis()))
+                            MessageList(
+                                messages = messages,
+                                isOtherUserTyping = isOtherUserTyping,
+                                modifier = Modifier.weight(1f)
+                            )
+                            TextEntryBox(
+                                messages = messages,
+                                onMessageSent = { messageText ->
+                                    messages.add(Message("User 1", messageText, System.currentTimeMillis()))
+                                    lastUserMessage = messageText
+                                    coroutineScope.launch {
+                                        delay(1000)
+                                        showOtherUserMessage = true
                                     }
-                                )
-                            }
+                                }
+                            )
                         }
                     }
                 )
 
                 LaunchedEffect(key1 = Unit) {
+                    delay(5000)
+                    isOtherUserTyping = true
                     delay(3000)
                     isOtherUserTyping = false
+                }
+
+                LaunchedEffect(key1 = showOtherUserMessage) {
+                    if (showOtherUserMessage) {
+                        delay(2000)
+                        val response = when (lastUserMessage.lowercase()) {
+                            "hello" -> "Hi there!"
+                            "how are you" -> "I'm doing great, thanks!"
+                            "im great aswell how is your day going" -> "My day is going well, thanks for asking!"
+                            else -> "Nice to hear from you!"
+                        }
+                        messages.add(Message("User 2", response, System.currentTimeMillis()))
+                        showOtherUserMessage = false
+                    }
                 }
             }
         }
@@ -63,11 +100,7 @@ class MainActivity : ComponentActivity() {
     companion object {
         val sampleMessages = listOf(
             Message("User 1", "Hello!", System.currentTimeMillis() - 10000),
-            Message("User 2", "Hi there!", System.currentTimeMillis() - 8000),
-            Message("User 1", "How are you?", System.currentTimeMillis() - 6000),
-            Message("User 2", "I'm doing well, thanks!", System.currentTimeMillis() - 4000),
-            Message("User 2", "What's up?", System.currentTimeMillis() - 2000),
-            Message("User 1", "Not much, just chilling!", System.currentTimeMillis() - 1000)
+            Message("User 2", "Hi there!", System.currentTimeMillis() - 8000)
         )
     }
 
@@ -114,6 +147,34 @@ class MainActivity : ComponentActivity() {
             ) {
                 CircularProgressIndicator(color = Color.Gray, strokeWidth = 2.dp)
             }
+        }
+    }
+}
+
+@Composable
+fun TopAppBarContent() {
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        modifier = Modifier.fillMaxWidth()
+    ) {
+        IconButton(onClick = { }) {
+            Icon(
+                Icons.Default.ArrowBack,
+                contentDescription = "Back"
+            )
+        }
+
+        Spacer(modifier = Modifier.width(8.dp))
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Box(
+                modifier = Modifier
+                    .size(40.dp)
+                    .clip(CircleShape)
+                    .background(Color.LightGray)
+                    .border(1.dp, Color.Gray, CircleShape)
+            )
+            Spacer(modifier = Modifier.width(14.dp))
+            Text("Sarah", fontWeight = FontWeight.Bold)
         }
     }
 }

@@ -10,12 +10,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.invenium.muzztest.data.local.entity.Message
+import com.invenium.muzztest.ui.theme.Pink300
 
 @Composable
 fun MessageBubble(message: Message) {
     val isSentByCurrentUser = message.sender == "User 1"
-    val bubbleColor = if (isSentByCurrentUser) Color.Blue else Color.LightGray
-    val textColor = if (isSentByCurrentUser) Color.White else Color.Blue
+    val bubbleColor = if (isSentByCurrentUser) Pink300 else Color.LightGray
+    val textColor = if (isSentByCurrentUser) Color.White else Color.Black
 
     Row(
         modifier = Modifier
