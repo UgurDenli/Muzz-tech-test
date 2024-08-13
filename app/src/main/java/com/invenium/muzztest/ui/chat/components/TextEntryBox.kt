@@ -10,9 +10,10 @@ import androidx.compose.material.TextField
 import androidx.compose.runtime.* // ktlint-disable no-wildcard-imports
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import com.invenium.muzztest.data.local.entity.Message
 
 @Composable
-fun TextEntryBox() {
+fun TextEntryBox(messages: MutableList<Message>, onMessageSent: (String) -> Unit) {
     var messageText by remember { mutableStateOf("") }
     Row(
         modifier = Modifier
@@ -27,6 +28,7 @@ fun TextEntryBox() {
             placeholder = { Text("Enter message") }
         )
         Button(onClick = {
+            onMessageSent(messageText)
             messageText = ""
         }) {
             Text("Send")
