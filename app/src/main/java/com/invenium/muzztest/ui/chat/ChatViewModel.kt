@@ -13,8 +13,14 @@ import kotlinx.coroutines.launch
 
 class ChatViewModel(private val database: MuzzDatabase) : ViewModel() {
     private val messageDao = database.messageDao()
+
+    // we create a liveData to observe the list of messages from the database to observe.
     val messages = messageDao.getMessages().asLiveData()
+
+    // state to track if the other user is typing
     var isOtherUserTyping by mutableStateOf(false)
+
+    // state to track if the other user did send a message.
     var showOtherUserMessage by mutableStateOf(false)
 
     init {
@@ -37,9 +43,11 @@ class ChatViewModel(private val database: MuzzDatabase) : ViewModel() {
     fun sendOtherUserMessage() {
         viewModelScope.launch {
             if (showOtherUserMessage) {
+                // Following the Exercise of " The message after it was sent less than 20 seconds afterwards"
                 delay(2000)
                 val lastUserMessage = messages.value?.lastOrNull()?.content ?: ""
                 val response = when (lastUserMessage.lowercase()) {
+                    // this is the user 2 message generation based on user 1 input.
                     "hello" -> "Hi there!"
                     "how are you" -> "I'm doing great, thanks!"
                     "im great aswell how is your day going" -> "My day is going well, thanks for asking!"

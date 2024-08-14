@@ -13,6 +13,7 @@ abstract class MuzzDatabase : RoomDatabase() {
     companion object {
         @Volatile private var INSTANCE: MuzzDatabase? = null
 
+        // Returns the database instance, but of course if there isnt one it will create it if it doesn't exist
         fun getInstance(context: Context): MuzzDatabase {
             return INSTANCE ?: synchronized(this) {
                 INSTANCE ?: buildDatabase(context).also { INSTANCE = it }

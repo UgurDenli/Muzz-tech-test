@@ -9,6 +9,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.* // ktlint-disable no-wildcard-imports
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.runtime.* // ktlint-disable no-wildcard-imports
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
@@ -30,6 +31,7 @@ import java.util.*
 @Composable
 fun ChatScreen(viewModel: ChatViewModel = viewModel()) {
     MuzzTestTheme {
+        // first we observe the messages LiveData from the ViewModel (this ensure MVVM architecture)
         val messages by viewModel.messages.observeAsState(initial = emptyList())
 
         Scaffold(
@@ -60,7 +62,7 @@ fun ChatScreen(viewModel: ChatViewModel = viewModel()) {
                 }
             }
         )
-
+        // I launch a coroutine to simulate the other user typing and sending a message to simulate two people chatting.
         LaunchedEffect(key1 = viewModel.showOtherUserMessage) {
             viewModel.sendOtherUserMessage()
         }
@@ -71,9 +73,10 @@ fun ChatScreen(viewModel: ChatViewModel = viewModel()) {
 fun TopAppBarContent() {
     Row(
         verticalAlignment = Alignment.CenterVertically,
-        modifier = Modifier.fillMaxWidth()
+        modifier = Modifier
+            .fillMaxSize()
     ) {
-        IconButton(onClick = { /* Handle back button click */ }) {
+        IconButton(onClick = {}) {
             Icon(
                 Icons.Default.ArrowBack,
                 contentDescription = "Back"
@@ -93,6 +96,14 @@ fun TopAppBarContent() {
             Spacer(modifier = Modifier.width(14.dp))
             Text("Sarah", fontWeight = FontWeight.Bold)
         }
+
+        Spacer(modifier = Modifier.weight(1f))
+        IconButton(onClick = {}) {
+            Icon(
+                imageVector = Icons.Filled.MoreVert,
+                contentDescription = "More Options"
+            )
+        }
     }
 }
 
@@ -102,7 +113,7 @@ fun MessageList(messages: List<Message>, isOtherUserTyping: Boolean, modifier: M
         val formatter = SimpleDateFormat("EEEE HH:mm", Locale.getDefault())
         formatter.format(Date(message.timestamp))
     }
-
+    // LazyColumn for efficient display of messages, basically a recyclerView.
     LazyColumn(
         modifier = modifier
             .fillMaxWidth()
@@ -111,9 +122,10 @@ fun MessageList(messages: List<Message>, isOtherUserTyping: Boolean, modifier: M
         groupedMessages.forEach { (section, messagesInSection) ->
             var showTimestamp = true
             var previousTimestamp: Long? = null
-            messagesInSection.forEachIndexed { index, message ->
+            messagesInSection.forEachIndexed { _, message ->
                 showTimestamp = !(
                     previousTimestamp != null &&
+                        // Making sure there's time between before another Timestamp
                         message.timestamp - previousTimestamp!! < 300000
                     )
 
