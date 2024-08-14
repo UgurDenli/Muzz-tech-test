@@ -8,14 +8,15 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.invenium.muzztest.data.local.entity.Message
-import com.invenium.muzztest.ui.theme.Pink300
+import com.invenium.muzztest.ui.theme.*
 
 @Composable
 fun MessageBubble(message: Message) {
     val isSentByCurrentUser = message.sender == "User 1"
-    val bubbleColor = if (isSentByCurrentUser) Pink300 else Color.LightGray
+    val bubbleColor = if (isSentByCurrentUser) Pink300 else Grey200
     val textColor = if (isSentByCurrentUser) Color.White else Color.Black
 
     Row(
@@ -33,7 +34,8 @@ fun MessageBubble(message: Message) {
         ) {
             Text(
                 text = message.content,
-                color = textColor
+                color = textColor,
+                textAlign = TextAlign.Start
             )
         }
     }
